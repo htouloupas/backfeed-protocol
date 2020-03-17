@@ -1,6 +1,5 @@
 from ..contracts.dmag import DMagContract
-
-from test_contract_base import BaseContractTestCase
+from .test_contract_base import BaseContractTestCase
 
 
 class DmagTest(BaseContractTestCase):
@@ -18,11 +17,16 @@ class DmagTest(BaseContractTestCase):
         contract = self.get_fresh_contract()
         contributor1 = contract.create_user()
         contributor2 = contract.create_user()
-        contract.create_contribution(user=contributor1, contribution_type=u'article')
-        contract.create_contribution(user=contributor2, contribution_type=u'comment')
-        self.assertEqual(contributor1.tokens, contract.USER_INITIAL_TOKENS - contract.CONTRIBUTION_TYPE['article']['fee'])
-        self.assertEqual(contributor2.tokens, contract.USER_INITIAL_TOKENS - contract.CONTRIBUTION_TYPE['comment']['fee'])
-        self.assertRaises(KeyError, contract.create_contribution, contributor1, contribution_type='spam')
+        contract.create_contribution(
+            user=contributor1, contribution_type=u'article')
+        contract.create_contribution(
+            user=contributor2, contribution_type=u'comment')
+        self.assertEqual(contributor1.tokens, contract.USER_INITIAL_TOKENS -
+                         contract.CONTRIBUTION_TYPE['article']['fee'])
+        self.assertEqual(contributor2.tokens, contract.USER_INITIAL_TOKENS -
+                         contract.CONTRIBUTION_TYPE['comment']['fee'])
+        self.assertRaises(KeyError, contract.create_contribution,
+                          contributor1, contribution_type='spam')
 
     #
     # Integration test
@@ -69,12 +73,16 @@ class DmagTest(BaseContractTestCase):
         self.assertEqual(user1.tokens, 50)
 
         # user2 and 3 make a contribution
-        contribution1 = contract.create_contribution(user2, contribution_type=u'article')
-        contribution2 = contract.create_contribution(user3, contribution_type=u'article')
+        contribution1 = contract.create_contribution(
+            user2, contribution_type=u'article')
+        contribution2 = contract.create_contribution(
+            user3, contribution_type=u'article')
 
         # a contribution has a fee of 1 token
-        self.assertEqual(user2.tokens, 50 - contract.CONTRIBUTION_TYPE['article']['fee'])
-        self.assertEqual(user3.tokens, 50 - contract.CONTRIBUTION_TYPE['article']['fee'])
+        self.assertEqual(user2.tokens, 50 -
+                         contract.CONTRIBUTION_TYPE['article']['fee'])
+        self.assertEqual(user3.tokens, 50 -
+                         contract.CONTRIBUTION_TYPE['article']['fee'])
 
         # we now expect the following distibution of tokens and reputation
         expected_state = {
@@ -100,7 +108,8 @@ class DmagTest(BaseContractTestCase):
         """
 
         # step 1: user1 evaluations the first contribution
-        contract.create_evaluation(user=user1, contribution=contribution1, value=1)
+        contract.create_evaluation(
+            user=user1, contribution=contribution1, value=1)
 
         # at this point, the reputation of user1 is diminished
         self.assertEqual(user1.reputation, 19.778885438199982)
@@ -119,7 +128,8 @@ class DmagTest(BaseContractTestCase):
         self.assert_user_states(expected_state)
 
         # step2: user2 now evaluations contribution1 with value 0
-        contract.create_evaluation(user=user2, contribution=contribution1, value=0)
+        contract.create_evaluation(
+            user=user2, contribution=contribution1, value=0)
 
         expected_state = {
             user1: {"reputation": 19.778885, "tokens": 50},
@@ -131,7 +141,8 @@ class DmagTest(BaseContractTestCase):
         self.assert_user_states(expected_state)
 
         # step 3:
-        contract.create_evaluation(user=user3, contribution=contribution1, value=1)
+        contract.create_evaluation(
+            user=user3, contribution=contribution1, value=1)
         expected_state = {
             user1: {"reputation": 20.5744385, "tokens": 50},
             user2: {"reputation": 19.8525613, "tokens": 50 - contract.CONTRIBUTION_TYPE['article']['fee']},
@@ -142,7 +153,8 @@ class DmagTest(BaseContractTestCase):
         self.assert_user_states(expected_state)
 
         # step 4
-        contract.create_evaluation(user=user4, contribution=contribution2, value=1)
+        contract.create_evaluation(
+            user=user4, contribution=contribution2, value=1)
         expected_state = {
             user1: {"reputation": 20.5744385, "tokens": 50},
             user2: {"reputation": 19.8525613, "tokens": 50 - contract.CONTRIBUTION_TYPE['article']['fee']},
@@ -153,7 +165,8 @@ class DmagTest(BaseContractTestCase):
         self.assert_user_states(expected_state)
 
         # step 5
-        contract.create_evaluation(user=user5, contribution=contribution2, value=0)
+        contract.create_evaluation(
+            user=user5, contribution=contribution2, value=0)
         expected_state = {
             user1: {"reputation": 20.5744385, "tokens": 50},
             user2: {"reputation": 19.8525613, "tokens": 50 - contract.CONTRIBUTION_TYPE['article']['fee']},
@@ -164,7 +177,8 @@ class DmagTest(BaseContractTestCase):
         self.assert_user_states(expected_state)
 
         # step 6
-        contract.create_evaluation(user=user1, contribution=contribution2, value=1)
+        contract.create_evaluation(
+            user=user1, contribution=contribution2, value=1)
         expected_state = {
             user1: {"reputation": 20.4822845, "tokens": 50},
             user2: {"reputation": 19.8525613, "tokens": 50 - contract.CONTRIBUTION_TYPE['article']['fee']},
@@ -175,7 +189,8 @@ class DmagTest(BaseContractTestCase):
         self.assert_user_states(expected_state)
 
         # step 7
-        contract.create_evaluation(user=user2, contribution=contribution1, value=1)
+        contract.create_evaluation(
+            user=user2, contribution=contribution1, value=1)
         expected_state = {
             user1: {"reputation": 21.0222536, "tokens": 50},
             user2: {"reputation": 22.7544628, "tokens": 78.9181779},
@@ -187,7 +202,8 @@ class DmagTest(BaseContractTestCase):
 
         # step 8
 
-        contract.create_evaluation(user=user3, contribution=contribution1, value=0)
+        contract.create_evaluation(
+            user=user3, contribution=contribution1, value=0)
         expected_state = {
             user1: {"reputation": 21.0222536, "tokens": 50},
             user2: {"reputation": 22.7544628, "tokens": 78.9181779},
@@ -199,7 +215,8 @@ class DmagTest(BaseContractTestCase):
 
         # step 9
 
-        contract.create_evaluation(user=user4, contribution=contribution1, value=1)
+        contract.create_evaluation(
+            user=user4, contribution=contribution1, value=1)
         expected_state = {
             user1: {"reputation": 21.5601483, "tokens": 50},
             user2: {"reputation": 23.4226197, "tokens": 79.7775807},
@@ -212,7 +229,8 @@ class DmagTest(BaseContractTestCase):
         # step 10
         # 22.1128137528 23.4226197071   23.2758500312   21.070815051    19.7590362707   50  79.7775807021   78.3008065193
 
-        contract.create_evaluation(user=user5, contribution=contribution2, value=1)
+        contract.create_evaluation(
+            user=user5, contribution=contribution2, value=1)
         expected_state = {
             user1: {"reputation": 22.1128137, "tokens": 50},
             user2: {"reputation": 23.4226197, "tokens": 79.7775807},
@@ -230,5 +248,7 @@ class DmagTest(BaseContractTestCase):
             user = self.contract.get_user(user_id=user.id)
             # self.assertTrue(user)
             # TODO: these tests are only precise in 2 decimals...
-            self.assertAlmostEqual(user.reputation, state_description[user]['reputation'], places=3)
-            self.assertAlmostEqual(user.tokens, state_description[user]['tokens'], places=2)
+            self.assertAlmostEqual(
+                user.reputation, state_description[user]['reputation'], places=3)
+            self.assertAlmostEqual(
+                user.tokens, state_description[user]['tokens'], places=2)

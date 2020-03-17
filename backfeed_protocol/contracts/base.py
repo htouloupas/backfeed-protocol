@@ -1,4 +1,3 @@
-from __future__ import division  # do division with floating point arithmetic
 from datetime import datetime
 from sqlalchemy import func
 
@@ -8,7 +7,7 @@ from ..models.evaluation import Evaluation
 from ..models.contract import Contract
 from ..models import DBSession
 from ..models import with_session
-from exceptions import InvalidContributionTypeError
+from .exceptions import InvalidContributionTypeError
 
 
 class BaseContract(Contract):
@@ -73,8 +72,7 @@ class BaseContract(Contract):
             # as a default, we use the first contribution type that is
             # first in alphanumeric ordering. We might want to make this
             # configurable.
-            contribution_types = self.CONTRIBUTION_TYPE.keys()
-            contribution_types.sort()
+            contribution_types = sorted(list(self.CONTRIBUTION_TYPE))
             contribution_type = contribution_types[0]
 
         if contribution_type not in self.CONTRIBUTION_TYPE:
@@ -229,7 +227,10 @@ class BaseContract(Contract):
         contributor = contribution.user
         reward_base = 0
         current_score = up_voted_rep / total_rep
-        max_score = contribution.max_score
+        if contribution.max_score is None:
+            max_score = 0.0
+        else:
+            max_score = contribution.max_score
         if current_score > max_score:
             if max_score >= self.CONTRIBUTION_TYPE[contribution.contribution_type]['reward_threshold']:
                 reward_base = current_score - max_score

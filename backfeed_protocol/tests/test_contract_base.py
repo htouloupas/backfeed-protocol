@@ -1,6 +1,4 @@
-import types
-
-from common import TestCase
+from .common import TestCase
 from ..contracts.base import BaseContract
 from .. import utils
 from ..models import DBSession
@@ -73,8 +71,8 @@ class ContractSanityTest(BaseContractTestCase):
         self.assertEqual(contract.get_users(), [user1, user2])
 
         # a user has a reputation and a number of tokens
-        self.assertTrue(isinstance(user1.reputation, types.FloatType))
-        self.assertTrue(isinstance(user1.tokens, types.FloatType))
+        self.assertTrue(isinstance(user1.reputation, float))
+        self.assertTrue(isinstance(user1.tokens, float))
 
         # user1 makes a contribution
         self.assertEqual(contract.get_contributions(), [])

@@ -12,3 +12,6 @@ backfeed_protocol.egg-info/
 .coverage
 .tox/
 files.txt
+.idea
+.vscode
+venv/*

@@ -32,7 +32,7 @@ def main():
 
 
 def list_simulations():
-    import whitepaper1
+    from backfeed_protocol.simulations import whitepaper1
     sims = [
         whitepaper1.WhitePaper1,
         whitepaper1.WhitePaper2,

@@ -1,7 +1,7 @@
 from datetime import datetime
 from ..contracts.dmag import DMagContract
 
-from test_contract_base import BaseContractTestCase
+from .test_contract_base import BaseContractTestCase
 
 
 class UserTest(BaseContractTestCase):
@@ -20,8 +20,10 @@ class UserTest(BaseContractTestCase):
         contract = self.contract
         referrer1 = contract.create_user(reputation=100, tokens=100)
         referrer2 = contract.create_user(reputation=100, tokens=100)
-        contributor = contract.create_user(referrer=referrer1, reputation=100, tokens=100)
-        evaluator1 = contract.create_user(reputation=1000, tokens=1000, referrer=referrer2)
+        contributor = contract.create_user(
+            referrer=referrer1, reputation=100, tokens=100)
+        evaluator1 = contract.create_user(
+            reputation=1000, tokens=1000, referrer=referrer2)
         evaluator2 = contract.create_user(reputation=1000, tokens=1000)
 
         self.assertEqual(contributor.referrer, referrer1)
@@ -33,11 +35,13 @@ class UserTest(BaseContractTestCase):
         contributor_tokens_pre = contributor.tokens
         contributor_reputation_pre = contributor.reputation
 
-        contract.create_evaluation(contribution=contribution, user=evaluator1, value=1)
+        contract.create_evaluation(
+            contribution=contribution, user=evaluator1, value=1)
 
         evaluator1_reputation_pre = evaluator1.reputation
 
-        contract.create_evaluation(contribution=contribution, user=evaluator2, value=1)
+        contract.create_evaluation(
+            contribution=contribution, user=evaluator2, value=1)
 
         # contributor is now rewarded for the contribution
         contributor_reputation_delta = contributor.reputation - contributor_reputation_pre
@@ -50,11 +54,13 @@ class UserTest(BaseContractTestCase):
         self.assertLess(100, referrer1.tokens)
 
         # to be precise, the reward for referrer1 is REFERRAL_REWARD_FRACTION * contributor's reward
-        self.assertAlmostEqual(contributor_reputation_delta * contract.REFERRAL_REWARD_FRACTION, (referrer1.reputation - 100),)
+        self.assertAlmostEqual(contributor_reputation_delta *
+                               contract.REFERRAL_REWARD_FRACTION, (referrer1.reputation - 100),)
 
         # We also get a similar thing going on for referrer the evaluator1
         evaluator1_reputation_delta = evaluator1.reputation - evaluator1_reputation_pre
         self.assertGreater(evaluator1_reputation_delta, 0)
         self.assertGreater(referrer2.reputation, 100)
 
-        self.assertAlmostEqual(evaluator1_reputation_delta * contract.REFERRAL_REWARD_FRACTION, (referrer2.reputation - 100),)
+        self.assertAlmostEqual(evaluator1_reputation_delta *
+                               contract.REFERRAL_REWARD_FRACTION, (referrer2.reputation - 100),)

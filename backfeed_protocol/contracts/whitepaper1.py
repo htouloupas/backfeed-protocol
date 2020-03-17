@@ -2,7 +2,7 @@
 this contract implements the flow function of the first example in the whitepaper
 """
 
-from base import BaseContract
+from .base import BaseContract
 
 
 class WhitePaper1Contract(BaseContract):

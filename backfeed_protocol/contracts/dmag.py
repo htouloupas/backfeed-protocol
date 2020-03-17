@@ -1,4 +1,4 @@
-from base import BaseContract
+from .base import BaseContract
 
 
 class DMagContract(BaseContract):

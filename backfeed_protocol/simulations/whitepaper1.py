@@ -1,6 +1,6 @@
 import random
 from ..contracts.whitepaper1 import WhitePaper1Contract
-from simulation import Simulation, StepEvaluate
+from .simulation import Simulation, StepEvaluate
 
 
 class WhitePaper1(Simulation):

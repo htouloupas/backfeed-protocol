@@ -1,7 +1,7 @@
 from ..contracts.dmag import DMagContract
 from ..models.evaluation import Evaluation
 
-from test_contract_base import BaseContractTestCase
+from .test_contract_base import BaseContractTestCase
 
 
 class TestContract(DMagContract):
@@ -57,16 +57,21 @@ class RewardsAndFeeTest(BaseContractTestCase):
         contract = self.get_fresh_contract()
 
         evaluator = contract.create_user(reputation=reputation_at_stake)
-        new_evaluator = contract.create_user(reputation=new_reputation_at_stake)
-        remaining_reputation = total_reputation - reputation_at_stake - new_reputation_at_stake
+        new_evaluator = contract.create_user(
+            reputation=new_reputation_at_stake)
+        remaining_reputation = total_reputation - \
+            reputation_at_stake - new_reputation_at_stake
         contributor = contract.create_user(reputation=remaining_reputation)
 
-        contribution = contract.create_contribution(user=contributor, contribution_type=u'article')
-        contract.create_evaluation(user=evaluator, contribution=contribution, value=1)
+        contribution = contract.create_contribution(
+            user=contributor, contribution_type=u'article')
+        contract.create_evaluation(
+            user=evaluator, contribution=contribution, value=1)
 
         reputation_before_reward = evaluator.reputation
 
-        contract.create_evaluation(user=new_evaluator, contribution=contribution, value=1)
+        contract.create_evaluation(
+            user=new_evaluator, contribution=contribution, value=1)
 
         reward = evaluator.reputation - reputation_before_reward
         return reward
@@ -77,26 +82,34 @@ class RewardsAndFeeTest(BaseContractTestCase):
         user1 = contract.create_user(reputation=20)
         user2 = contract.create_user(reputation=3)
         contribution = contract.create_contribution(user=user0)
-        contract.create_evaluation(contribution=contribution, user=user0, value=1)
-        contract.create_evaluation(contribution=contribution, user=user1, value=0)
-        evaluation = contract.create_evaluation(contribution=contribution, user=user2, value=1)
+        contract.create_evaluation(
+            contribution=contribution, user=user0, value=1)
+        contract.create_evaluation(
+            contribution=contribution, user=user1, value=0)
+        evaluation = contract.create_evaluation(
+            contribution=contribution, user=user2, value=1)
 
-        self.assertEqual(contract.sum_equally_voted_reputation(evaluation.contribution, value=1), user0.reputation + user2.reputation)
+        self.assertEqual(contract.sum_equally_voted_reputation(
+            evaluation.contribution, value=1), user0.reputation + user2.reputation)
 
     def test_evaluation_reward(self):
-        reward = self.evaluation_reward(reputation_at_stake=.2, new_reputation_at_stake=0.2)
+        reward = self.evaluation_reward(
+            reputation_at_stake=.2, new_reputation_at_stake=0.2)
         self.assertAlmostEqual(reward, 0.00795, places=4)
 
         # get a BIG confirmation of 80%
-        reward = self.evaluation_reward(reputation_at_stake=.2, new_reputation_at_stake=0.8)
+        reward = self.evaluation_reward(
+            reputation_at_stake=.2, new_reputation_at_stake=0.8)
         self.assertAlmostEqual(reward, 0.012686, places=4)
 
         #
-        reward = self.evaluation_reward(reputation_at_stake=.8, new_reputation_at_stake=0.2)
+        reward = self.evaluation_reward(
+            reputation_at_stake=.8, new_reputation_at_stake=0.2)
         self.assertAlmostEqual(reward, 0.01279, places=4)
 
         # a small stake with a small confirmation
-        reward = self.evaluation_reward(reputation_at_stake=.01, new_reputation_at_stake=0.01)
+        reward = self.evaluation_reward(
+            reputation_at_stake=.01, new_reputation_at_stake=0.01)
         self.assertAlmostEqual(reward, 0.0003963, places=4)
 
     #
@@ -114,10 +127,13 @@ class RewardsAndFeeTest(BaseContractTestCase):
         contributor = contract.create_user(reputation=0.0)
         evaluator = contract.create_user(reputation=upvoted_reputation)
         contract.create_user(reputation=total_reputation - upvoted_reputation)
-        contribution = contract.create_contribution(user=contributor, contribution_type=u'article')
+        contribution = contract.create_contribution(
+            user=contributor, contribution_type=u'article')
         contribution.user.tokens = 0
-        evaluation = Evaluation(contract=contract, contribution=contribution, user=evaluator, value=1)
-        contract.reward_contributor(contribution, 1, upvoted_reputation, total_reputation)
+        evaluation = Evaluation(
+            contract=contract, contribution=contribution, user=evaluator, value=1)
+        contract.reward_contributor(
+            contribution, 1, upvoted_reputation, total_reputation)
 
         reputation_reward = evaluation.contribution.user.reputation
         token_reward = evaluation.contribution.user.tokens
@@ -134,9 +150,12 @@ class RewardsAndFeeTest(BaseContractTestCase):
         self.assertAlmostEqual(self.contribution_reward(1.0)[0], 50, places=4)
         self.assertAlmostEqual(self.contribution_reward(1.0)[1], 5, places=4)
 
-        self.assertAlmostEqual(self.contribution_reward(0.6, 1)[1], 3, places=4)
-        self.assertAlmostEqual(self.contribution_reward(30, 50)[1], 3, places=4)
-        self.assertAlmostEqual(self.contribution_reward(33, 49)[1], 3.3673, places=4)
+        self.assertAlmostEqual(
+            self.contribution_reward(0.6, 1)[1], 3, places=4)
+        self.assertAlmostEqual(
+            self.contribution_reward(30, 50)[1], 3, places=4)
+        self.assertAlmostEqual(self.contribution_reward(33, 49)[
+                               1], 3.3673, places=4)
 
     def test_contribution_reward_increments(self):
         # test if the contributor does not get rewarded twice
@@ -146,11 +165,13 @@ class RewardsAndFeeTest(BaseContractTestCase):
         evaluator2 = contract.create_user(reputation=0)
         evaluator3 = contract.create_user(reputation=0)
         extra_user = contract.create_user(reputation=0.3)
-        contribution = contract.create_contribution(user=contributor, contribution_type=u'article')
+        contribution = contract.create_contribution(
+            user=contributor, contribution_type=u'article')
         contribution.user.tokens = 0
 
         # evaluator 1 upvotes the contribution with his 0.7 rep
-        evaluation1 = contract.create_evaluation(contribution=contribution, user=evaluator1, value=1)
+        evaluation1 = contract.create_evaluation(
+            contribution=contribution, user=evaluator1, value=1)
         # the contributor should recieve a reward as this point
         self.assertGreater(evaluation1.contribution.user.reputation, 0)
         self.assertGreater(evaluation1.contribution.user.tokens, 0)
@@ -171,7 +192,8 @@ class RewardsAndFeeTest(BaseContractTestCase):
         self.assertEqual(contract.total_reputation(), 1.0)
 
         # evalualor2 now evaluates
-        evaluation2 = contract.create_evaluation(contribution=contribution, user=evaluator2, value=1)
+        evaluation2 = contract.create_evaluation(
+            contribution=contribution, user=evaluator2, value=1)
 
         # the contributor will not get new rewards, as the total upvotes
         # for this contribution have not reached the level of the previous payout
@@ -179,7 +201,8 @@ class RewardsAndFeeTest(BaseContractTestCase):
         self.assertEqual(evaluation2.contribution.user.reputation, 0)
 
         # but if we add more rep, the contributor _will_ get rewarded
-        evaluation3 = contract.create_evaluation(contribution=contribution, user=evaluator3, value=1)
+        evaluation3 = contract.create_evaluation(
+            contribution=contribution, user=evaluator3, value=1)
         self.assertGreater(evaluation3.contribution.user.tokens, 0)
         self.assertGreater(evaluation3.contribution.user.reputation, 0)
 
@@ -195,27 +218,38 @@ class RewardsAndFeeTest(BaseContractTestCase):
 
         """
         contract = self.get_fresh_contract()
-        contributor = contract.create_user(reputation=total_reputation - reputation_at_stake)
+        contributor = contract.create_user(
+            reputation=total_reputation - reputation_at_stake)
         evaluator = contract.create_user(reputation=reputation_at_stake)
-        contribution = contract.create_contribution(user=contributor, contribution_type=u'article')
+        contribution = contract.create_contribution(
+            user=contributor, contribution_type=u'article')
         # do not use contract.create_evaluation in the test, because that will call pay_evaluation_fee
-        evaluation = Evaluation(user=evaluator, contribution=contribution, value=1, contract=contract)
+        evaluation = Evaluation(
+            user=evaluator, contribution=contribution, value=1, contract=contract)
         evaluator_rep = evaluator.reputation
         engaged_rep = contribution.engaged_reputation()
         total_rep = contract.total_reputation()
-        contract.pay_evaluation_fee(evaluator, contribution, evaluator_rep, engaged_rep, total_rep)
+        contract.pay_evaluation_fee(
+            evaluator, contribution, evaluator_rep, engaged_rep, total_rep)
         fee_payed = reputation_at_stake - evaluation.user.reputation
         return fee_payed
 
     def test_evaluation_fee(self):
-        self.assertAlmostEqual(self.evaluation_fee(reputation_at_stake=0.00), 0.0)
-        self.assertAlmostEqual(self.evaluation_fee(reputation_at_stake=0.25), 0.0025, places=4)
-        self.assertAlmostEqual(self.evaluation_fee(reputation_at_stake=0.33), 0.0028, places=4)
-        self.assertAlmostEqual(self.evaluation_fee(reputation_at_stake=0.50), 0.0029, places=4)
-        self.assertAlmostEqual(self.evaluation_fee(reputation_at_stake=1.00), 0.0000, places=4)
+        self.assertAlmostEqual(self.evaluation_fee(
+            reputation_at_stake=0.00), 0.0)
+        self.assertAlmostEqual(self.evaluation_fee(
+            reputation_at_stake=0.25), 0.0025, places=4)
+        self.assertAlmostEqual(self.evaluation_fee(
+            reputation_at_stake=0.33), 0.0028, places=4)
+        self.assertAlmostEqual(self.evaluation_fee(
+            reputation_at_stake=0.50), 0.0029, places=4)
+        self.assertAlmostEqual(self.evaluation_fee(
+            reputation_at_stake=1.00), 0.0000, places=4)
 
     def test_evaluation_fee_depends_only_on_relative_reputation(self):
         # make sure that the evaluation fee a user pays depends only on her repution as a fraction of the total
-        fee1 = self.evaluation_fee(reputation_at_stake=0.314, total_reputation=1.0)
-        fee2 = self.evaluation_fee(reputation_at_stake=314, total_reputation=1000)
+        fee1 = self.evaluation_fee(
+            reputation_at_stake=0.314, total_reputation=1.0)
+        fee2 = self.evaluation_fee(
+            reputation_at_stake=314, total_reputation=1000)
         self.assertAlmostEqual(fee1 / 1.0, fee2 / 1000, places=4)

@@ -1,7 +1,7 @@
 import sqlalchemy
 import logging
 
-from test_contract_base import BaseContractTestCase
+from .test_contract_base import BaseContractTestCase
 from ..models import DBSession
 from ..models.user import User
 from ..models.contribution import Contribution
@@ -21,16 +21,11 @@ class TestWithPostgres(BaseContractTestCase):
             super(TestWithPostgres, self).setUp()
             self.db_ok = True
         except sqlalchemy.exc.OperationalError as error:
-            msg = []
-            msg.append('*' * 80)
-            msg.append("WARNING: There was an error connecting to the postgres server.")
-            msg.append("For this test to work, you need to set up a test database")
-            msg.append(self.settings['sqlalchemy.url'])
-            msg.append('psql -c "create database backfeed_test"')
-            msg.append('psql -c "create user backfeed_test password \'backfeed\'"')
-            msg.append('psql -c "grant all on database backfeed_test to backfeed_test"')
-            msg.append(unicode(error))
-            msg.append('*' * 80)
+            msg = ['*' * 80, "WARNING: There was an error connecting to the postgres server.",
+                   "For this test to work, you need to set up a test database", self.settings['sqlalchemy.url'],
+                   'psql -c "create database backfeed_test"',
+                   'psql -c "create user backfeed_test password \'backfeed\'"',
+                   'psql -c "grant all on database backfeed_test to backfeed_test"', str(error), '*' * 80]
             msg = '\n'.join(msg)
             self.db_ok = False
             logging.error(msg)
@@ -45,7 +40,8 @@ class TestWithPostgres(BaseContractTestCase):
         if self.db_ok:
             user = self.contract.create_user()
             contribution = self.contract.create_contribution(user=user)
-            self.contract.create_evaluation(user=user, contribution=contribution, value=1)
+            self.contract.create_evaluation(
+                user=user, contribution=contribution, value=1)
             self.assertEqual(DBSession.query(User).count(), 1)
             self.assertEqual(DBSession.query(Contribution).count(), 1)
             self.assertEqual(DBSession.query(Evaluation).count(), 1)

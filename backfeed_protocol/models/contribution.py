@@ -1,4 +1,5 @@
 from datetime import datetime
+from .contract import *
 
 from sqlalchemy import Column
 from sqlalchemy import Unicode

@@ -1,22 +1,22 @@
-
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm.exc import NoResultFound
 
-from models import initialize_sql
-from models import DBSession
-from models.contribution import Contribution
-from models.contract import Contract
-from models.evaluation import Evaluation
-from models.user import User
-from models import with_session
-from contracts.dmag import DMagContract
-from contracts.example import ExampleContract
+from .models import initialize_sql
+from .models import DBSession
+from .models.contribution import Contribution
+from .models.contract import Contract
+from .models.evaluation import Evaluation
+from .models.user import User
+from .models import with_session
+from .contracts.dmag import DMagContract
+from .contracts.example import ExampleContract
 
 
-def setup_database(
-        settings={
+def setup_database(settings=None):
+    if settings is None:
+        settings = {
             'sqlalchemy.url': 'sqlite:///:memory:',
-        }):
+        }
     engine = engine_from_config(settings, 'sqlalchemy.')
     initialize_sql(engine)
 

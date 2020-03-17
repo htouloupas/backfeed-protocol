@@ -1,7 +1,7 @@
 import backfeed_protocol
 from ..contracts.dmag import DMagContract
 from ..contracts.example import ExampleContract
-from common import TestCase
+from .common import TestCase
 
 
 class GetContractTestCase(TestCase):
